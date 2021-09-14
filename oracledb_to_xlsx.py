@@ -25,5 +25,5 @@ con.close()
 
 # xlsx 파일로 저장
 data.head()
-data.to_excel('xlsx_name')
+data.to_excel(xlsx_name)
 print(f'{xlsx_name} Save success!')
