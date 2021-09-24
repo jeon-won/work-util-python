@@ -1,13 +1,16 @@
 import cx_Oracle
 import pandas as pd
-
 """
 oracledb_to_xlsx.py
 * Date: 2021. 9. 14.
 * Author: Jeon Won
 * Func: 오라클 DB 쿼리 실행 결과를 엑셀 파일(xlsx)로 저장
-* Usage: `pip install cx_Oracle pandas` 명령어로 필요한 모듈 설치 → 상수 및 변수 값 설정 후 실행
+* Usage: `pip install cx_Oracle pandas openpyxl` 명령어로 필요한 모듈 설치 → 상수 및 변수 값 설정 후 실행
 """
+
+# Oracle Instant Client 설치 필요
+# https://cx-oracle.readthedocs.io/en/latest/user_guide/installation.html 참고
+cx_Oracle.init_oracle_client(lib_dir=r"C:\oracle\instantclient_19_12")
 
 # 상수 & 변수
 USERNAME = 'USERNAME'
