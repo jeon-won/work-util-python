@@ -37,7 +37,7 @@ SEOUL_GU_CODE = {
 def get_apt_trade_data(service_key, lawd_cd, deal_ymd):
     """
     - 아파트매매 실거래자료(XML)를 반환합니다.
-    - 사용 API: https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15058017
+    - 사용 API 안내: https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15058017
     Args:
         - service_key (str): 디코딩된 공공데이터 포털 일반 인증키
         - lawd_cmd (str): 각 지역별 코드
@@ -55,7 +55,7 @@ def get_apt_trade_data(service_key, lawd_cd, deal_ymd):
 def get_apt_rent_data(service_key, lawd_cd, deal_ymd):
     """
     - 아파트 전월세자료(XML)를 반환합니다.
-    - 사용 API: https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15058747
+    - 사용 API 안내: https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15058747
     Args:
         - service_key (str): 디코딩된 공공데이터 포털 일반 인증키
         - lawd_cmd (str): 각 지역별 코드
@@ -73,7 +73,7 @@ def get_apt_trade_list(data):
     """
     아파트매매 실거래자료(XML)를 받아 파싱된 리스트를 반환합니다.
 
-    Args: data (<class 'bytes'>): 공공데이터 포털 API를 통해 받아온 데이터
+    Args: data (<class 'bytes'>). 공공데이터 포털 API를 통해 받아온 데이터.
 
     Return: <class 'list'>
     """
@@ -100,7 +100,7 @@ def get_apt_rent_list(data):
     """
     아파트매매 전월세자료(XML)를 받아 파싱된 리스트를 반환합니다.
 
-    Args: data (<class 'bytes'>): 공공데이터 포털 API를 통해 받아온 데이터
+    Args: data (<class 'bytes'>). 공공데이터 포털 API를 통해 받아온 데이터.
 
     Return: <class 'list'>
     """
@@ -132,8 +132,9 @@ def save_to_xlsx(data):
 
     Return: None
     """
-    wb = Workbook() # 워크북
-    ws = wb.active  # 워크시트
+    # 워크북 및 워크시트 생성
+    wb = Workbook()
+    ws = wb.active
 
     # 틀 고정 및 컬럼 명 찍기
     ws.freeze_panes = "A2"
@@ -144,13 +145,14 @@ def save_to_xlsx(data):
         ws.append([item['년월'], item['구'], item['동'], item['아파트명'], item['전용면적'], item['거래금액'], item['전세가'], item['매매-전세갭']])
     
     # 엑셀 파일저장
-    date = datetime.today().strftime('%Y-%m-%d_%H-%M-%S')
+    date = f"gap_{datetime.today().strftime('%Y-%m-%d_%H-%M-%S')}"
     file_name = f"{date}.xlsx"
     wb.save(file_name)
     wb.close()
     print(f'{file_name} 저장 완료!')
 
 
+# 매매-전세 갭 자료를 gap_data 배열에 담을 거임
 gap_data = []
 print(f"{YEAR_MONTH} 매매-전세 갭이 {GAP}만원 이하인 서울시 아파트 내역을 조사합니다.")
 
@@ -169,22 +171,20 @@ for gu in SEOUL_GU_CODE:
             
             # 전세만 추려내서
             if(index_rent == index_trade and item_rent['월세금액'] == 0):
-                gap = item_trade['거래금액'] - item_rent['보증금액']
-               
                 # 매매-전세 갭이 일정 금액 이하인 자료를 배열에 저장
+                gap = item_trade['거래금액'] - item_rent['보증금액']
                 if(gap <= GAP):
-                    dic = {
-                        '년월': YEAR_MONTH,
-                        '구': gu,
-                        '동': item_trade['법정동'],
-                        '아파트명': item_trade['아파트'],
-                        '전용면적': item_trade['전용면적'],
-                        '거래금액': item_trade['거래금액'],
-                        '전세가': item_rent['보증금액'],
-                        '매매-전세갭': gap
-                    }
+                    dic = {}
+                    dic['년월'] = YEAR_MONTH
+                    dic['구'] = gu
+                    dic['동'] = item_trade['법정동']
+                    dic['아파트명'] = item_trade['아파트']
+                    dic['전용면적'] = item_trade['전용면적']
+                    dic['거래금액'] = item_trade['거래금액']
+                    dic['전세가'] = item_rent['보증금액']
+                    dic['매매-전세갭'] = gap
                     gap_data.append(dic)
                     print(dic)
-                    # print(f"{gu} {index_trade} / 매매가: {item_trade['거래금액']/10000}억 / 전세가: {item_rent['보증금액']/10000}억 / 매매-전세 갭: {gap/10000}억")
 
+# 매매-전세 갭 자료를 엑셀 파일로 저장
 save_to_xlsx(gap_data)
