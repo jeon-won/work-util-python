@@ -70,6 +70,13 @@ def get_apt_rent_data(service_key, lawd_cd, deal_ymd):
     return response.content
 
 def get_apt_trade_list(data):
+    """
+    아파트매매 실거래자료(XML)를 받아 파싱된 리스트를 반환합니다.
+
+    Args: data (<class 'bytes'>): 공공데이터 포털 API를 통해 받아온 데이터
+
+    Return: <class 'list'>
+    """
     # xml 데이터 중 item 태그 전체를 가져옴
     soup = BeautifulSoup(data, 'xml')
     items = soup.find_all('item')
@@ -90,6 +97,13 @@ def get_apt_trade_list(data):
     return trade_list
 
 def get_apt_rent_list(data):
+    """
+    아파트매매 전월세자료(XML)를 받아 파싱된 리스트를 반환합니다.
+
+    Args: data (<class 'bytes'>): 공공데이터 포털 API를 통해 받아온 데이터
+
+    Return: <class 'list'>
+    """
     # xml 데이터 중 item 태그 전체를 가져옴
     soup = BeautifulSoup(data, 'xml')
     items = soup.find_all('item')
@@ -111,6 +125,13 @@ def get_apt_rent_list(data):
     return rent_list
 
 def save_to_xlsx(data):
+    """
+    매매-전세갭 자료를 엑셀 파일(xlsx)로 저장합니다.
+
+    Args: data (<class 'list'>): 매매-전세갭 자료
+
+    Return: None
+    """
     wb = Workbook() # 워크북
     ws = wb.active  # 워크시트
 
@@ -150,7 +171,7 @@ for gu in SEOUL_GU_CODE:
             if(index_rent == index_trade and item_rent['월세금액'] == 0):
                 gap = item_trade['거래금액'] - item_rent['보증금액']
                
-                # 매매-전세 갭이 일정 금액 이하인 자료(딕셔너리)를 배열에 저장
+                # 매매-전세 갭이 일정 금액 이하인 자료를 배열에 저장
                 if(gap <= GAP):
                     dic = {
                         '년월': YEAR_MONTH,
